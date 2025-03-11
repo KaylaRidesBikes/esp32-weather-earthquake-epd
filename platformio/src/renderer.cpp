@@ -326,6 +326,12 @@ void drawCurrentConditions(const owm_current_t &current,
   // display.drawLine(0, 196, DISP_WIDTH - 1, 196, GxEPD_BLACK);
 
   // current weather data icons
+
+  /*
+   *TODO: comment out weather data that will be replaced
+   * by earthquake data.
+   *
+   */
   display.drawInvertedBitmap(0, 204 + (48 + 8) * 0,
                              wi_sunrise_48x48, 48, 48, GxEPD_BLACK);
   display.drawInvertedBitmap(0, 204 + (48 + 8) * 1,

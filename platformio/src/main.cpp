@@ -40,6 +40,7 @@
 // too large to allocate locally on stack
 static owm_resp_onecall_t       owm_onecall;
 static owm_resp_air_pollution_t owm_air_pollution;
+static usgs_earth_resp_t        usgs_earthquake;
 
 Preferences prefs;
 
@@ -271,6 +272,20 @@ void setup()
   {
     killWiFi();
     statusStr = "Air Pollution API";
+    tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
+    initDisplay();
+    do
+    {
+      drawError(wi_cloud_down_196x196, statusStr, tmpStr);
+    } while (display.nextPage());
+    powerOffDisplay();
+    beginDeepSleep(startTime, &timeInfo);
+  }
+  // getUSGSEarthquake
+  rxStatus = getUSGSEarthquake(client, usgs_earthquake);
+  if(rxStatus != HTTP_CODE_OK){
+    killWiFi();
+    statusStr = "USGS Earthquake API";
     tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
     initDisplay();
     do

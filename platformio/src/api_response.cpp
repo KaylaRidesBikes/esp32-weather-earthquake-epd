@@ -16,9 +16,25 @@
  */
 
 #include <vector>
+#include <math.h>
 #include <ArduinoJson.h>
+
 #include "api_response.h"
 #include "config.h"
+
+// Haversine formula for distance calculation
+float calculateDistance(float lat1, float lon1, float lat2, float lon2) {
+  const float R = 6371.0; // Earth radius in km
+  float dLat = radians(lat2 - lat1);
+  float dLon = radians(lon2 - lon1);
+
+  float a = sin(dLat / 2) * sin(dLat / 2) +
+            cos(radians(lat1)) * cos(radians(lat2)) *
+            sin(dLon / 2) * sin(dLon / 2);
+
+  float c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  return R * c;
+}
 
 DeserializationError deserializeOneCall(WiFiClient &json,
                                         owm_resp_onecall_t &r)
@@ -253,3 +269,95 @@ DeserializationError deserializeAirQuality(WiFiClient &json,
   return error;
 } // end deserializeAirQuality
 
+DeserializationError deserializeUSGSEarthquake(WiFiClient &json, usgs_earth_resp_t &r, 
+                                               float my_lat, float my_lon){
+  float min_distance;
+  int i;
+
+  JsonDocument filter;
+  
+  filter["metadata"]                          = false;
+  filter["features"]["bbox"]                  = false;
+
+  filter["features"]["properties"]["mag"]     = true;
+  filter["features"]["properties"]["place"]   = true;
+  filter["features"]["properties"]["time"]    = true;
+  filter["features"]["properties"]["updated"] = true;
+  filter["features"]["properties"]["tz"]      = false;
+  filter["features"]["properties"]["url"]     = false;
+  filter["features"]["properties"]["detail"]  = false;
+  filter["features"]["properties"]["felt"]    = false;
+  filter["features"]["properties"]["cdi"]     = false;
+  filter["features"]["properties"]["mmi"]     = false;
+  filter["features"]["properties"]["alert"]   = true;
+  filter["features"]["properties"]["status"]  = true;
+  filter["features"]["properties"]["tsunami"] = true;
+  filter["features"]["properties"]["sig"]     = false;
+  filter["features"]["properties"]["net"]     = false;
+  filter["features"]["properties"]["code"]    = false;
+  filter["features"]["properties"]["ids"]     = false;
+  filter["features"]["properties"]["sources"] = false;
+  filter["features"]["properties"]["types"]   = false;
+  filter["features"]["properties"]["nst"]     = false;
+  filter["features"]["properties"]["dmin"]    = true;
+  filter["features"]["properties"]["rms"]     = false;
+  filter["features"]["properties"]["gap"]     = false;
+  filter["features"]["properties"]["magType"] = false;
+  filter["features"]["properties"]["title"]   = false;
+
+  filter["features"]["geometry"]              = true;
+  filter["features"]["id"]                    = false;
+
+  JsonDocument doc;
+
+  DeserializationError error = deserializeJson(doc, json,
+                                         DeserializationOption::Filter(filter));
+
+#if DEBUG_LEVEL >= 1
+  Serial.println("[debug] doc.overflowed() : "
+                 + String(doc.overflowed()));
+#endif
+#if DEBUG_LEVEL >= 2
+  serializeJsonPretty(doc, Serial);
+#endif
+  if (error) {
+    return error;
+  }
+  i = 0;
+  min_distance = 0;
+
+  for(JsonObject feature : doc["features"].as<JsonArray>()) {
+    usgs_earth_resp_t curr_r;
+    JsonObject properties       = feature["properties"];
+    curr_r.features[i].properties.mag       = properties["mag"]     .as<float>();
+    curr_r.features[i].properties.place     = properties["place"]   .as<const char *>();
+    curr_r.features[i].properties.time      = properties["time"]    .as<int64_t>();
+    curr_r.features[i].properties.updated   = properties["updated"] .as<int64_t>();
+
+    curr_r.features[i].properties.alert     = properties["alert"]   .as<const char *>();
+    curr_r.features[i].properties.status    = properties["status"]  .as<int64_t>();
+    curr_r.features[i].properties.tsunami   = properties["tsunami"] .as<int64_t>();
+    curr_r.features[i].properties.dmin      = properties["dmin"]    .as<float>();
+
+    JsonObject geometry    = doc["geometry"];
+    curr_r.features[i].geometry.lat    = geometry["lat"]   .as<float>();
+    curr_r.features[i].geometry.lon    = geometry["lon"]   .as<float>();
+    curr_r.features[i].geometry.depth  = geometry["depth"] .as<float>();
+
+    float distance = calculateDistance(my_lat, my_lon, 
+                    curr_r.features[i].geometry.lat, curr_r.features[i].geometry.lon);
+    
+    if (distance < min_distance) {
+      min_distance = distance;
+      r = curr_r;
+    }
+
+    if (i == USGS_NUM_SIG_EVENTS - 1)
+    {
+      break;
+    }
+    ++i;
+  }
+
+  return error;
+} // end deserializeUSGSEarthquake

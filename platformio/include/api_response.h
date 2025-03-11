@@ -31,6 +31,9 @@
 #define OWM_NUM_ALERTS         8 // OpenWeatherMaps does not specify a limit, but if you need more alerts you are probably doomed.
 #define OWM_NUM_AIR_POLLUTION 24 // Depending on AQI scale, hourly concentrations will need to be averaged over a period of 1h to 24h
 
+#define USGS_NUM_SIG_EVENTS   10 // no limit to earthquake events, set to 10 per day
+#define USGS_NUM_GEOMETRY      3 // 3 coordinate pts max
+
 typedef struct owm_weather
 {
   int     id;               // Weather condition id
@@ -180,6 +183,94 @@ typedef struct owm_resp_onecall
 } owm_resp_onecall_t;
 
 /*
+ * Struct for USGS earthquake API response
+ *
+ * https://earthquake.usgs.gov/fdsnws/event/1/
+ */
+
+typedef struct usgs_metadata
+{
+  int64_t generated;
+  String url;
+  String title;
+  String api;
+  int count;
+  int status;
+} usgs_metadata_t;
+
+/*
+* bounds for event location in degrees. Depth in km.
+*/
+typedef struct usgs_bbox
+{
+  float min_longitude;
+  float min_latitude;
+  float min_depth;
+  float max_longitude;
+  float max_latitude;
+  float max_depth;
+} usgs_bbox_t;
+
+/*
+* Specific details about the event.
+*/
+typedef struct usgs_properties
+{
+  float mag;          // earthquake magnitude [-1.0, 10.0]
+  String place;       // city/region of eathquake
+  int64_t time;       // time of earthquake
+  int64_t updated;    // time earthquake updated
+  int16_t tz;         // timezone offset [-1200, 1200]
+  String url;         // USGS event page link
+  String detail;      // geoJSON detail feed link
+  int felt;           // number of reports submitted to DYFI
+  float cdi;          // reported intensity [0.0, 10.0]
+  float mmi;          // estimated intensity [0.0, 10.0]
+  String alert;       // alert level based on PAGER scale
+  String status;      // auto-reviewed, human reviewed, deleted
+  uint8_t tsunami;    // tsunami true = 1, false = 0
+  uint16_t sig;       // earthquake significance level [0,1000]
+  String net;         // ID of data contributor
+  String code;        // Identifiable code for specific earthquake
+  String ids;         // comma-seperated list of associated events
+  String sources;     // comma seperated list of contributors
+  String types;       // comma-seperated list of product types
+  int nst;            // number of seismic stations used to determine loc
+  float dmin;         // distance from epicenter to nearest station in deg
+  float gap;          // smaller num = more accurate horiz position of earthquake 
+  String mag_type;    // algorithm used for calculating magnitude
+  String type;        // type of seismic event
+
+} usgs_properties_t;
+
+/*
+* Geographical location details about the event.
+*/
+typedef struct usgs_geom
+{
+  float lat;
+  float lon;
+  float depth;
+} usgs_geom_t;
+
+typedef struct usgs_feature
+{
+  usgs_properties_t properties;
+  usgs_geom_t geometry;
+  String id;                // ID for event
+} usgs_feature_t;
+
+typedef struct usgs_earth_resp
+{
+  usgs_metadata_t metadata;
+  usgs_feature_t features[USGS_NUM_SIG_EVENTS];
+  usgs_bbox_t bbox;
+  
+} usgs_earth_resp_t;
+
+
+
+/*
  * Coordinates from the specified location (latitude, longitude)
  */
 typedef struct owm_coord
@@ -211,11 +302,14 @@ typedef struct owm_resp_air_pollution
   int64_t          dt[OWM_NUM_AIR_POLLUTION];         // Date and time, Unix, UTC;
 } owm_resp_air_pollution_t;
 
-DeserializationError deserializeOneCall(WiFiClient &json,
-                                        owm_resp_onecall_t &r);
-DeserializationError deserializeAirQuality(WiFiClient &json,
-                                           owm_resp_air_pollution_t &r);
 
+
+DeserializationError deserializeOneCall(WiFiClient &json,
+                                    owm_resp_onecall_t &r);
+DeserializationError deserializeAirQuality(WiFiClient &json,
+                                    owm_resp_air_pollution_t &r);
+DeserializationError deserializeUSGSEarthquake(WiFiClient &json, 
+                                    usgs_earth_resp_t &r, float my_lat, float my_lon);                                           
 
 #endif
 

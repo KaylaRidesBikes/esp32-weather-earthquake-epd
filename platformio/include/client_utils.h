@@ -34,11 +34,12 @@ bool printLocalTime(tm *timeInfo);
 #ifdef USE_HTTP
   int getOWMonecall(WiFiClient &client, owm_resp_onecall_t &r);
   int getOWMairpollution(WiFiClient &client, owm_resp_air_pollution_t &r);
+  int getUSGSEarthquake(WiFiClient &client, usgs_earth_resp_t &r);
 #else
   int getOWMonecall(WiFiClientSecure &client, owm_resp_onecall_t &r);
   int getOWMairpollution(WiFiClientSecure &client, owm_resp_air_pollution_t &r);
+  int getUSGSEarthquake(WiFiClientSecure &client, usgs_earth_resp_t &r);
 #endif
-
 
 #endif
 
