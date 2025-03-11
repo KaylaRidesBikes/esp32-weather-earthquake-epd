@@ -269,50 +269,25 @@ DeserializationError deserializeAirQuality(WiFiClient &json,
   return error;
 } // end deserializeAirQuality
 
-DeserializationError deserializeUSGSEarthquake(WiFiClient &json, usgs_earth_resp_t &r, 
+DeserializationError deserializeUSGSEarthquake(WiFiClient &json, usgs_feature_t &r, 
                                                float my_lat, float my_lon){
   float min_distance;
-  int i;
 
   JsonDocument filter;
-  
   filter["metadata"]                          = false;
   filter["features"]["bbox"]                  = false;
-
-  filter["features"]["properties"]["mag"]     = true;
-  filter["features"]["properties"]["place"]   = true;
-  filter["features"]["properties"]["time"]    = true;
-  filter["features"]["properties"]["updated"] = true;
-  filter["features"]["properties"]["tz"]      = false;
-  filter["features"]["properties"]["url"]     = false;
-  filter["features"]["properties"]["detail"]  = false;
-  filter["features"]["properties"]["felt"]    = false;
-  filter["features"]["properties"]["cdi"]     = false;
-  filter["features"]["properties"]["mmi"]     = false;
-  filter["features"]["properties"]["alert"]   = true;
-  filter["features"]["properties"]["status"]  = true;
-  filter["features"]["properties"]["tsunami"] = true;
-  filter["features"]["properties"]["sig"]     = false;
-  filter["features"]["properties"]["net"]     = false;
-  filter["features"]["properties"]["code"]    = false;
-  filter["features"]["properties"]["ids"]     = false;
-  filter["features"]["properties"]["sources"] = false;
-  filter["features"]["properties"]["types"]   = false;
-  filter["features"]["properties"]["nst"]     = false;
-  filter["features"]["properties"]["dmin"]    = true;
-  filter["features"]["properties"]["rms"]     = false;
-  filter["features"]["properties"]["gap"]     = false;
-  filter["features"]["properties"]["magType"] = false;
-  filter["features"]["properties"]["title"]   = false;
-
   filter["features"]["geometry"]              = true;
   filter["features"]["id"]                    = false;
 
   JsonDocument doc;
-
-  DeserializationError error = deserializeJson(doc, json,
+  
+  DeserializationError error = deserializeJson(doc, json);
+  
+  /*
+    DeserializationError error = deserializeJson(doc, json,
                                          DeserializationOption::Filter(filter));
-
+  */
+  
 #if DEBUG_LEVEL >= 1
   Serial.println("[debug] doc.overflowed() : "
                  + String(doc.overflowed()));
@@ -323,41 +298,43 @@ DeserializationError deserializeUSGSEarthquake(WiFiClient &json, usgs_earth_resp
   if (error) {
     return error;
   }
-  i = 0;
-  min_distance = 0;
 
-  for(JsonObject feature : doc["features"].as<JsonArray>()) {
-    usgs_earth_resp_t curr_r;
-    JsonObject properties       = feature["properties"];
-    curr_r.features[i].properties.mag       = properties["mag"]     .as<float>();
-    curr_r.features[i].properties.place     = properties["place"]   .as<const char *>();
-    curr_r.features[i].properties.time      = properties["time"]    .as<int64_t>();
-    curr_r.features[i].properties.updated   = properties["updated"] .as<int64_t>();
+  min_distance = __FLT_MAX__;
+  float lat = 0.0;
+  float lon = 0.0;
 
-    curr_r.features[i].properties.alert     = properties["alert"]   .as<const char *>();
-    curr_r.features[i].properties.status    = properties["status"]  .as<int64_t>();
-    curr_r.features[i].properties.tsunami   = properties["tsunami"] .as<int64_t>();
-    curr_r.features[i].properties.dmin      = properties["dmin"]    .as<float>();
+  for (JsonObject feature : doc["features"].as<JsonArray>()) {
 
-    JsonObject geometry    = doc["geometry"];
-    curr_r.features[i].geometry.lat    = geometry["lat"]   .as<float>();
-    curr_r.features[i].geometry.lon    = geometry["lon"]   .as<float>();
-    curr_r.features[i].geometry.depth  = geometry["depth"] .as<float>();
+    JsonArray coordinates = feature["geometry"]["coordinates"];
+    lon = coordinates[0].as<float>();  // Longitude is first
+    lat = coordinates[1].as<float>();  // Latitude is second
 
-    float distance = calculateDistance(my_lat, my_lon, 
-                    curr_r.features[i].geometry.lat, curr_r.features[i].geometry.lon);
-    
+    Serial.print("Latitude: "); Serial.println(lat);
+    Serial.print("Longitude: "); Serial.println(lon);
+
+    float distance = calculateDistance(my_lat, my_lon, lat, lon);
+
     if (distance < min_distance) {
       min_distance = distance;
-      r = curr_r;
+
+      JsonObject geometry = feature["geometry"];
+      r.geometry.lat   = lat;
+      r.geometry.lon   = lon;
+      r.geometry.depth = geometry["depth"] .as<float>();
+
+      JsonObject properties = feature["properties"];
+      r.properties.mag      = properties["mag"]     .as<float>();
+      r.properties.place    = properties["place"]   .as<const char *>();
+      r.properties.time     = properties["time"]    .as<int64_t>();
+      r.properties.updated  = properties["updated"] .as<int64_t>();
+      r.properties.alert    = properties["alert"]   .as<const char *>();
+      r.properties.status   = properties["status"]  .as<int64_t>();
+      r.properties.tsunami  = properties["tsunami"] .as<int64_t>();
+      r.properties.dmin     = properties["dmin"]    .as<float>();                               
     }
 
-    if (i == USGS_NUM_SIG_EVENTS - 1)
-    {
-      break;
-    }
-    ++i;
   }
 
   return error;
+
 } // end deserializeUSGSEarthquake

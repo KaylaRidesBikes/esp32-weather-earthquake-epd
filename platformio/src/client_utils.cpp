@@ -281,14 +281,14 @@ bool waitForSNTPSync(tm *timeInfo)
 #ifdef USE_HTTP
   int getUSGSEarthquake(WiFiClient &client, usgs_earth_resp_t &r)
 #else
-  int getUSGSEarthquake(WiFiClientSecure &client, usgs_earth_resp_t &r)
+  int getUSGSEarthquake(WiFiClientSecure &client, usgs_feature_t &r)
 #endif
 {
   int attempts = 0;
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
 
-  String uri = "/earthquakes/feed/v1.0/summary/significant_day.geojson";
+  String uri = "/earthquakes/feed/v1.0/summary/significant_week.geojson";
 
   String sanitizedUri = USGS_ENDPOINT + uri;
 
@@ -307,12 +307,17 @@ bool waitForSNTPSync(tm *timeInfo)
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
+    http.useHTTP10(true);
     http.begin(client, USGS_ENDPOINT, OWM_PORT, uri);
 
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
+
       jsonErr = deserializeUSGSEarthquake(http.getStream(), r, NUM_LAT, NUM_LON);
+
+      
+
       if (jsonErr)
       {
         // -256 offset distinguishes these errors from httpClient errors

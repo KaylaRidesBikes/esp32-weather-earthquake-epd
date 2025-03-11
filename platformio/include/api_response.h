@@ -309,7 +309,7 @@ DeserializationError deserializeOneCall(WiFiClient &json,
 DeserializationError deserializeAirQuality(WiFiClient &json,
                                     owm_resp_air_pollution_t &r);
 DeserializationError deserializeUSGSEarthquake(WiFiClient &json, 
-                                    usgs_earth_resp_t &r, float my_lat, float my_lon);                                           
+                                    usgs_feature_t &r, float my_lat, float my_lon);                                           
 
 #endif
 

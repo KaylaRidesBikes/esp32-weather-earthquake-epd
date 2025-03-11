@@ -40,7 +40,7 @@
 // too large to allocate locally on stack
 static owm_resp_onecall_t       owm_onecall;
 static owm_resp_air_pollution_t owm_air_pollution;
-static usgs_earth_resp_t        usgs_earthquake;
+static usgs_feature_t        usgs_earthquake;
 
 Preferences prefs;
 
@@ -282,6 +282,7 @@ void setup()
     beginDeepSleep(startTime, &timeInfo);
   }
   // getUSGSEarthquake
+  client.setCACert(cert_USGS);
   rxStatus = getUSGSEarthquake(client, usgs_earthquake);
   if(rxStatus != HTTP_CODE_OK){
     killWiFi();
@@ -296,6 +297,14 @@ void setup()
     beginDeepSleep(startTime, &timeInfo);
   }
   killWiFi(); // WiFi no longer needed
+
+  Serial.println("=== Earthquake Event ===");
+
+    // Properties
+    Serial.print("Magnitude: "); Serial.println(usgs_earthquake.properties.mag);
+    Serial.print("Location: "); Serial.println(usgs_earthquake.properties.place);
+    Serial.print("Time: "); Serial.println(usgs_earthquake.properties.time);
+    Serial.print("Updated: "); Serial.println(usgs_earthquake.properties.updated);
 
   // GET INDOOR TEMPERATURE AND HUMIDITY, start BME280...
   pinMode(PIN_BME_PWR, OUTPUT);
