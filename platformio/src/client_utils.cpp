@@ -326,6 +326,7 @@ bool waitForSNTPSync(tm *timeInfo)
       rxSuccess = !jsonErr;
     }
     client.stop();
+    http.useHTTP10(false);
     http.end();
     Serial.println("  " + String(httpResponse, DEC) + " "
                    + getHttpResponsePhrase(httpResponse));
