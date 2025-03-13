@@ -705,10 +705,16 @@ void drawCurrentConditions(const owm_current_t &current,
 } // end drawCurrentConditions
 
 
-void drawUSGSData(const usgs_feature_t *sig){
+void drawUSGSData(const usgs_feature_t &sig){
   String dataStr;
-  dataStr = String(TXT_USGS_TITLE);
-  drawString(0, 170, dataStr, LEFT);
+  dataStr = "USGS Seismic Activity";
+  display.setFont(&FONT_12pt8b);
+  drawString(0, 175, dataStr, LEFT);
+
+  
+
+
+
 }
 
 

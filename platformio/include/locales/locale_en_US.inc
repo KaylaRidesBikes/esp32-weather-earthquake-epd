@@ -125,11 +125,6 @@ const char *TXT_UNITS_PRECIP_MILLIMETERS = "mm";
 const char *TXT_UNITS_PRECIP_CENTIMETERS = "cm";
 const char *TXT_UNITS_PRECIP_INCHES      = "in";
 
-//USGS EARTHQUAKE DISPLAY MESSAGES
-const char *TXT_USGS_TITLE = "USGS Seismic Activity";
-const char *TXT_USGS_NEAREST_SIG_TITLE = "Nearest Significant Event";
-const char *TXT_USGS_NEAREST_RECENT = "Nearest Most Recent Event";
-
 // MISCELLANEOUS MESSAGES
 // Title Case
 const char *TXT_LOW_BATTERY = "Low Battery";
