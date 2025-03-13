@@ -125,12 +125,18 @@ const char *TXT_UNITS_PRECIP_MILLIMETERS = "mm";
 const char *TXT_UNITS_PRECIP_CENTIMETERS = "cm";
 const char *TXT_UNITS_PRECIP_INCHES      = "in";
 
+//USGS EARTHQUAKE DISPLAY MESSAGES
+const char *TXT_USGS_TITLE = "USGS Seismic Activity";
+const char *TXT_USGS_NEAREST_SIG_TITLE = "Nearest Significant Event";
+const char *TXT_USGS_NEAREST_RECENT = "Nearest Most Recent Event";
+
 // MISCELLANEOUS MESSAGES
 // Title Case
 const char *TXT_LOW_BATTERY = "Low Battery";
 const char *TXT_NETWORK_NOT_AVAILABLE = "Network Not Available";
 const char *TXT_TIME_SYNCHRONIZATION_FAILED = "Time Synchronization Failed";
 const char *TXT_WIFI_CONNECTION_FAILED = "WiFi Connection Failed";
+
 // First Word Capitalized
 const char *TXT_ATTEMPTING_HTTP_REQ = "Attempting HTTP request";
 const char *TXT_AWAKE_FOR = "Awake for";

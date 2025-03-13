@@ -97,6 +97,11 @@ extern const char *TXT_UNITS_PRECIP_MILLIMETERS;
 extern const char *TXT_UNITS_PRECIP_CENTIMETERS;
 extern const char *TXT_UNITS_PRECIP_INCHES;
 
+//USGS EARTHQUAKE DISPLAY MESSAGES
+extern const char *TXT_USGS_TITLE;
+extern const char *TXT_USGS_NEAREST_SIG_TITLE;
+extern const char *TXT_USGS_NEAREST_RECENT;
+
 // MISCELLANEOUS MESSAGES
 // Title Case
 extern const char *TXT_LOW_BATTERY;

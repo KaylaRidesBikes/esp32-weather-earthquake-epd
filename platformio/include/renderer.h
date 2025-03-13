@@ -74,6 +74,7 @@ void drawCurrentConditions(const owm_current_t &current,
                            const owm_daily_t &today,
                            const owm_resp_air_pollution_t &owm_air_pollution,
                            float inTemp, float inHumidity);
+void drawUSGSData(const usgs_feature_t &sig);
 void drawForecast(const owm_daily_t *daily, tm timeInfo);
 void drawAlerts(std::vector<owm_alerts_t> &alerts,
                 const String &city, const String &date);

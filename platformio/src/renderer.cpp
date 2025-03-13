@@ -704,12 +704,13 @@ void drawCurrentConditions(const owm_current_t &current,
   return;
 } // end drawCurrentConditions
 
-/*
+
 void drawUSGSData(const usgs_feature_t *sig){
   String dataStr;
-  drawString(196 + 164 / 2, 96 / 2 + 20, dataStr, CENTER);
+  dataStr = String(TXT_USGS_TITLE);
+  drawString(0, 170, dataStr, LEFT);
 }
-*/
+
 
 /* This function is responsible for drawing the five day forecast.
  */
