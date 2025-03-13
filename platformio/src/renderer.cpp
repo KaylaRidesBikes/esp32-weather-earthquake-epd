@@ -374,9 +374,11 @@ void drawCurrentConditions(const owm_current_t &current,
 
   // current weather data labels
   display.setFont(&FONT_7pt8b);
+  drawString(48, 175 + 24 + 10 + (48 + 8), "Mag", LEFT);
   //drawString(48, 204 + 10 + (48 + 8) * 0, TXT_SUNRISE, LEFT);
   drawString(48, 104 + 10 + (48 + 8) * 0, TXT_WIND, LEFT);
   //drawString(48, 204 + 10 + (48 + 8) * 2, TXT_UV_INDEX, LEFT);
+  
 #ifndef DISP_BW_V1
   const char *air_quality_index_label;
   if (aqi_desc_type(AQI_SCALE) == AIR_QUALITY_DESC)
@@ -711,7 +713,18 @@ void drawUSGSData(const usgs_feature_t &sig){
   display.setFont(&FONT_12pt8b);
   drawString(0, 175, dataStr, LEFT);
 
+  dataStr = "Nearest Significant Event:";
+  display.setFont(&FONT_8pt8b);
+  drawString(0, 175 + 12, dataStr, LEFT);
+
+  dataStr = String(sig.properties.place);
+  drawString(0, 175 + 24, dataStr, LEFT);
+
+  display.drawInvertedBitmap(0, 175 + 24 + (48 + 8), 
+                            wi_earthquake_48x48, 48, 48, GxEPD_BLACK);
   
+  dataStr = String(sig.properties.mag);
+  drawString(48, 175 + 14 + (48 + 8), dataStr, LEFT);
 
 
 
