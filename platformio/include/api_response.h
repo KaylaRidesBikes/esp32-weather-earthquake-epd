@@ -220,25 +220,10 @@ typedef struct usgs_properties
   String place;       // city/region of eathquake
   int64_t time;       // time of earthquake
   int64_t updated;    // time earthquake updated
-  int16_t tz;         // timezone offset [-1200, 1200]
-  String url;         // USGS event page link
-  String detail;      // geoJSON detail feed link
-  int felt;           // number of reports submitted to DYFI
-  float cdi;          // reported intensity [0.0, 10.0]
-  float mmi;          // estimated intensity [0.0, 10.0]
   String alert;       // alert level based on PAGER scale
   String status;      // auto-reviewed, human reviewed, deleted
   uint8_t tsunami;    // tsunami true = 1, false = 0
-  uint16_t sig;       // earthquake significance level [0,1000]
-  String net;         // ID of data contributor
-  String code;        // Identifiable code for specific earthquake
-  String ids;         // comma-seperated list of associated events
-  String sources;     // comma seperated list of contributors
-  String types;       // comma-seperated list of product types
-  int nst;            // number of seismic stations used to determine loc
   float dmin;         // distance from epicenter to nearest station in deg
-  float gap;          // smaller num = more accurate horiz position of earthquake 
-  String mag_type;    // algorithm used for calculating magnitude
   String type;        // type of seismic event
 
 } usgs_properties_t;

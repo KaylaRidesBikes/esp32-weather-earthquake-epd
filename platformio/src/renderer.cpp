@@ -348,10 +348,10 @@ void drawCurrentConditions(const owm_current_t &current,
 #ifndef DISP_BW_V1
   display.drawInvertedBitmap(250, 104 + (48 + 8) * 0,
                              air_filter_48x48, 48, 48, GxEPD_BLACK);
-/*
+  
   display.drawInvertedBitmap(0, 204 + (48 + 8) * 4,
                              house_thermometer_48x48, 48, 48, GxEPD_BLACK);
-*/
+  
 #endif
 /*
   display.drawInvertedBitmap(170, 204 + (48 + 8) * 0,
@@ -367,14 +367,17 @@ void drawCurrentConditions(const owm_current_t &current,
 /*
   display.drawInvertedBitmap(170, 204 + (48 + 8) * 3,
                              visibility_icon_48x48, 48, 48, GxEPD_BLACK);
+*/
   display.drawInvertedBitmap(170, 204 + (48 + 8) * 4,
                              house_humidity_48x48, 48, 48, GxEPD_BLACK);
-*/
+
 #endif
 
   // current weather data labels
   display.setFont(&FONT_7pt8b);
-  drawString(48, 175 + 24 + 10 + (48 + 8), "Mag", LEFT);
+  drawString(48, 200 + 16 + 6 + 9 + 5, "Mag", LEFT);
+  drawString(48, 310 + 22 + 13 + 10, "Mag", LEFT);
+
   //drawString(48, 204 + 10 + (48 + 8) * 0, TXT_SUNRISE, LEFT);
   drawString(48, 104 + 10 + (48 + 8) * 0, TXT_WIND, LEFT);
   //drawString(48, 204 + 10 + (48 + 8) * 2, TXT_UV_INDEX, LEFT);
@@ -390,14 +393,14 @@ void drawCurrentConditions(const owm_current_t &current,
     air_quality_index_label = TXT_AIR_POLLUTION;
   }
   drawString(300, 104 + 10 + (48 + 8) * 0, air_quality_index_label, LEFT);
-  //drawString(48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_TEMPERATURE, LEFT);
+  drawString(48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_TEMPERATURE, LEFT);
 #endif
   //drawString(170 + 48, 204 + 10 + (48 + 8) * 0, TXT_SUNSET, LEFT);
   drawString(135+ 48, 104 + 10 + (48 + 8) * 0, TXT_HUMIDITY, LEFT);
   //drawString(170 + 48, 204 + 10 + (48 + 8) * 2, TXT_PRESSURE, LEFT);
 #ifndef DISP_BW_V1
   //drawString(170 + 48, 204 + 10 + (48 + 8) * 3, TXT_VISIBILITY, LEFT);
-  //drawString(170 + 48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_HUMIDITY, LEFT);
+  drawString(170 + 48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_HUMIDITY, LEFT);
 #endif
 
 // sunrise (string)
@@ -552,7 +555,7 @@ void drawCurrentConditions(const owm_current_t &current,
   }
 
   // indoor temperature
-  /*
+  
   display.setFont(&FONT_12pt8b);
   if (!std::isnan(inTemp))
   {
@@ -575,7 +578,6 @@ void drawCurrentConditions(const owm_current_t &current,
   dataStr += "\260";
 #endif
   drawString(48, 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2, dataStr, LEFT);
-*/
 #endif // defined(DISP_BW_V2) || defined(DISP_3C_B) || defined(DISP_7C_F)
 
 
@@ -685,6 +687,7 @@ void drawCurrentConditions(const owm_current_t &current,
   display.setFont(&FONT_8pt8b);
   drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * 3 + 48 / 2,
              unitStr, LEFT);
+  */ 
 
   // indoor humidity
   display.setFont(&FONT_12pt8b);
@@ -701,32 +704,67 @@ void drawCurrentConditions(const owm_current_t &current,
   drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2,
              "%", LEFT);
 
-  */
 #endif // defined(DISP_BW_V2) || defined(DISP_3C_B) || defined(DISP_7C_F)
   return;
 } // end drawCurrentConditions
 
-
-void drawUSGSData(const usgs_feature_t &sig){
+/*
+* Function responsible for all earthquake related data
+*/
+void drawUSGSData(const usgs_feature_t &sig, const usgs_feature_t &rec){
   String dataStr;
   dataStr = "USGS Seismic Activity";
   display.setFont(&FONT_12pt8b);
   drawString(0, 175, dataStr, LEFT);
 
-  dataStr = "Nearest Significant Event:";
+  // earthquake important data                                                   
+  dataStr = String(sig.properties.mag);
+  drawString(48, 200 + 16 + 3 + (9 + 3) + 24 + 5, dataStr, LEFT);
+
+  dataStr = String(rec.properties.mag);
+  drawString(48, 310 + 18 + 5 + 36 + 10, dataStr, LEFT);
+
+  //sub-headers / locations
+  dataStr = "Nearest Significant Event: " + String(sig.properties.type);
   display.setFont(&FONT_8pt8b);
-  drawString(0, 175 + 12, dataStr, LEFT);
+  drawString(0, 197, dataStr, LEFT);
 
+  dataStr = "Nearest Recent Event: " + String(rec.properties.type);
+  drawString(0, 310 + 5, dataStr, LEFT);
+
+  display.setFont(&FONT_10pt8b);
   dataStr = String(sig.properties.place);
-  drawString(0, 175 + 24, dataStr, LEFT);
+  drawString(0, 200 + 16 + 5, dataStr, LEFT);
 
-  display.drawInvertedBitmap(0, 175 + 24 + (48 + 8), 
+  dataStr = String(rec.properties.place);
+  drawString(0, 310 + 18 + 10, dataStr, LEFT);
+
+  // earthquake information icons
+  display.drawInvertedBitmap(0, 200 + 16 + 3 + 5, 
                             wi_earthquake_48x48, 48, 48, GxEPD_BLACK);
   
-  dataStr = String(sig.properties.mag);
-  drawString(48, 175 + 14 + (48 + 8), dataStr, LEFT);
+  display.drawInvertedBitmap(0, 310 + 18 + 5 + 10, 
+                            wi_earthquake_48x48, 48, 48, GxEPD_BLACK);
+  
+  display.drawInvertedBitmap(135, 200 + 16 + 3 + 5, 
+                            wi_tsunami_48x48, 48, 48, GxEPD_BLACK);
+  
+  display.drawInvertedBitmap(135, 310 + 18 + 5 + 10, 
+                            wi_tsunami_48x48, 48, 48, GxEPD_BLACK);
+  
+  // warning / time information
+  display.setFont(&FONT_8pt8b);
+  dataStr = getTsunamiWarning(sig);
+  drawString(135 + 48, 200 + 16 + 3 + (9 + 3) + 24 + 5, dataStr, LEFT);
 
+  dataStr = getTsunamiWarning(rec);
+  drawString(135 + 48, 310 + 18 + 5 + 36 + 10, dataStr, LEFT);
 
+  getDateTimeStr(dataStr, sig.properties.time);
+  drawString(0, 200 + 16 + 3 + (9 + 3) + 48 + 5, "Occured: " + dataStr, LEFT);
+
+  getDateTimeStr(dataStr, rec.properties.time);
+  drawString(0, 310 + 48 + 18 + 18 + 10, "Occured: " + dataStr, LEFT);
 
 }
 

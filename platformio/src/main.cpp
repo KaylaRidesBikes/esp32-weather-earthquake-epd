@@ -40,7 +40,8 @@
 // too large to allocate locally on stack
 static owm_resp_onecall_t       owm_onecall;
 static owm_resp_air_pollution_t owm_air_pollution;
-static usgs_feature_t        usgs_earthquake;
+static usgs_feature_t           usgs_earthquake;
+static usgs_feature_t           usgs_earthquake_recent;
 
 Preferences prefs;
 
@@ -283,7 +284,23 @@ void setup()
   }
   // getUSGSEarthquake
   client.setCACert(cert_USGS);
-  rxStatus = getUSGSEarthquake(client, usgs_earthquake);
+  rxStatus = getUSGSEarthquake(client, usgs_earthquake,
+  "/earthquakes/feed/v1.0/summary/significant_week.geojson");
+  if(rxStatus != HTTP_CODE_OK){
+    killWiFi();
+    statusStr = "USGS Earthquake API";
+    tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
+    initDisplay();
+    do
+    {
+      drawError(wi_cloud_down_196x196, statusStr, tmpStr);
+    } while (display.nextPage());
+    powerOffDisplay();
+    beginDeepSleep(startTime, &timeInfo);
+  }
+
+  rxStatus = getUSGSEarthquake(client, usgs_earthquake_recent, 
+    "/earthquakes/feed/v1.0/summary/1.0_hour.geojson");
   if(rxStatus != HTTP_CODE_OK){
     killWiFi();
     statusStr = "USGS Earthquake API";
@@ -301,10 +318,10 @@ void setup()
   Serial.println("=== Earthquake Event ===");
 
     // Properties
-    Serial.print("Magnitude: "); Serial.println(usgs_earthquake.properties.mag);
-    Serial.print("Location: "); Serial.println(usgs_earthquake.properties.place);
-    Serial.print("Time: "); Serial.println(usgs_earthquake.properties.time);
-    Serial.print("Updated: "); Serial.println(usgs_earthquake.properties.updated);
+    Serial.print("Magnitude: "); Serial.println(usgs_earthquake_recent.properties.mag);
+    Serial.print("Location: "); Serial.println(usgs_earthquake_recent.properties.place);
+    Serial.print("Time: "); Serial.println(usgs_earthquake_recent.properties.time);
+    Serial.print("Updated: "); Serial.println(usgs_earthquake_recent.properties.updated);
 
   // GET INDOOR TEMPERATURE AND HUMIDITY, start BME280...
   pinMode(PIN_BME_PWR, OUTPUT);
@@ -353,7 +370,7 @@ void setup()
   {
     drawCurrentConditions(owm_onecall.current, owm_onecall.daily[0],
                           owm_air_pollution, inTemp, inHumidity);
-    drawUSGSData(usgs_earthquake);
+    drawUSGSData(usgs_earthquake, usgs_earthquake_recent);
     drawOutlookGraph(owm_onecall.hourly, owm_onecall.daily, timeInfo);
     drawForecast(owm_onecall.daily, timeInfo);
     drawLocationDate(CITY_STRING, dateStr);

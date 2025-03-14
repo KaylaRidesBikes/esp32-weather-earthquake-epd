@@ -54,6 +54,7 @@ uint32_t readBatteryVoltage();
 uint32_t calcBatPercent(uint32_t v, uint32_t minv, uint32_t maxv);
 const uint8_t *getBatBitmap24(uint32_t batPercent);
 void getDateStr(String &s, tm *timeInfo);
+void getDateTimeStr(String &s, int64_t epochTime);
 void getRefreshTimeStr(String &s, bool timeSuccess, tm *timeInfo);
 void toTitleCase(String &text);
 void truncateExtraAlertInfo(String &text);
@@ -80,6 +81,8 @@ const char *getHttpResponsePhrase(int code);
 const char *getWifiStatusPhrase(wl_status_t status);
 void printHeapUsage();
 void disableBuiltinLED();
+
+const char *getTsunamiWarning(const usgs_feature_t &f);
 
 #endif
 

@@ -274,19 +274,20 @@ DeserializationError deserializeUSGSEarthquake(WiFiClient &json, usgs_feature_t 
   float min_distance;
 
   JsonDocument filter;
-  filter["metadata"]                          = false;
-  filter["features"]["bbox"]                  = false;
-  filter["features"]["geometry"]              = true;
-  filter["features"]["id"]                    = false;
+  filter["type"]                                 = false;
+  filter["metadata"]                             = false;
+  filter["features"]                             = true;
+  filter["features"][0]["bbox"]                  = false;
+  filter["features"][0]["geometry"]              = true;
+  filter["features"][0]["id"]                    = false;
 
   JsonDocument doc;
   
-  DeserializationError error = deserializeJson(doc, json);
+  //DeserializationError error = deserializeJson(doc, json);
   
-  /*
-    DeserializationError error = deserializeJson(doc, json,
-                                         DeserializationOption::Filter(filter));
-  */
+  DeserializationError error = deserializeJson(doc, json,
+                                        DeserializationOption::Filter(filter));
+  
   
 #if DEBUG_LEVEL >= 1
   Serial.println("[debug] doc.overflowed() : "
@@ -309,9 +310,6 @@ DeserializationError deserializeUSGSEarthquake(WiFiClient &json, usgs_feature_t 
     lon = coordinates[0].as<float>();  // Longitude is first
     lat = coordinates[1].as<float>();  // Latitude is second
 
-    Serial.print("Latitude: "); Serial.println(lat);
-    Serial.print("Longitude: "); Serial.println(lon);
-
     float distance = calculateDistance(my_lat, my_lon, lat, lon);
 
     if (distance < min_distance) {
@@ -330,7 +328,8 @@ DeserializationError deserializeUSGSEarthquake(WiFiClient &json, usgs_feature_t 
       r.properties.alert    = properties["alert"]   .as<const char *>();
       r.properties.status   = properties["status"]  .as<int64_t>();
       r.properties.tsunami  = properties["tsunami"] .as<int64_t>();
-      r.properties.dmin     = properties["dmin"]    .as<float>();                               
+      r.properties.dmin     = properties["dmin"]    .as<float>();  
+      r.properties.type     = properties["type"]    .as<const char *>();                             
     }
 
   }

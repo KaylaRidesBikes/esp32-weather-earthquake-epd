@@ -38,7 +38,7 @@ bool printLocalTime(tm *timeInfo);
 #else
   int getOWMonecall(WiFiClientSecure &client, owm_resp_onecall_t &r);
   int getOWMairpollution(WiFiClientSecure &client, owm_resp_air_pollution_t &r);
-  int getUSGSEarthquake(WiFiClientSecure &client, usgs_feature_t &r);
+  int getUSGSEarthquake(WiFiClientSecure &client, usgs_feature_t &r, String uri);
 #endif
 
 #endif

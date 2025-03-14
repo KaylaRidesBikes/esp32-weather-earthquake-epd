@@ -149,6 +149,23 @@ void getDateStr(String &s, tm *timeInfo)
   return;
 } // end getDateStr
 
+void getDateTimeStr(String &s, int64_t epochTime){
+  time_t epochT = static_cast<time_t>(epochTime / 1000);
+  struct tm *time_info;
+  char buf[80] = {};
+
+  time_info = localtime(&epochT);
+
+  if(time_info == NULL){
+    s = "--";
+  }
+
+  _strftime(buf, sizeof(buf), "%Y %B %e %l:%M%P", time_info);
+  s = buf;
+
+  return;
+}
+
 /* Gets string with the current date and time of the current refresh attempt.
  */
 void getRefreshTimeStr(String &s, bool timeSuccess, tm *timeInfo)
@@ -1542,3 +1559,11 @@ void disableBuiltinLED()
   gpio_deep_sleep_hold_en();
   return;
 } // end disableBuiltinLED
+
+const char *getTsunamiWarning(const usgs_feature_t &f){
+  if(f.properties.tsunami > 0){
+    return "Potential Tsunami";
+  } else {
+    return "No Tsunami";
+  }
+}

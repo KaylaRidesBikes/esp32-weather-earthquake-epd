@@ -279,16 +279,14 @@ bool waitForSNTPSync(tm *timeInfo)
 
 // getUSGSEarthquakeData
 #ifdef USE_HTTP
-  int getUSGSEarthquake(WiFiClient &client, usgs_earth_resp_t &r)
+  int getUSGSEarthquake(WiFiClient &client, usgs_earth_resp_t &r, String uri)
 #else
-  int getUSGSEarthquake(WiFiClientSecure &client, usgs_feature_t &r)
+  int getUSGSEarthquake(WiFiClientSecure &client, usgs_feature_t &r, String uri)
 #endif
 {
   int attempts = 0;
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
-
-  String uri = "/earthquakes/feed/v1.0/summary/significant_week.geojson";
 
   String sanitizedUri = USGS_ENDPOINT + uri;
 
