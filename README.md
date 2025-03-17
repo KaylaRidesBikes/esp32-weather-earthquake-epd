@@ -1,14 +1,12 @@
-# ESP32 E-Paper Weather Display
+# ESP32 E-Paper Weather Display with Earthquake Data from USGS
 
-This is a weather display powered by a wifi-enabled ESP32 microcontroller and a 7.5in E-Paper (aka E-ink) display. Current and forecasted weather data is obtained from the OpenWeatherMap API. A sensor provides the display with accurate indoor temperature and humidity.
+I live along a fault line and wanted to add seismic data to my display. I utilized the USGS Earthquake API and implemented my own haversine formula function to determine the closest events to display on my board. I removed some weather data in order to make room for the earthquake information. The code is still there just commented out :). The rest of the README is from the original project by Luke Marzen. Power consumption, setup and other details for my version are still being updated.
 
 <p float="left">
-  <img src="showcase/assembled-demo-raleigh-front.jpg" />
-  <img src="showcase/assembled-demo-raleigh-side.jpg" width="49%" />
-  <img src="showcase/assembled-demo-raleigh-back.jpg" width="49%" />
-  <img src="showcase/assembled-demo-bottom-cover.jpg" width="49%" />
-  <img src="showcase/assembled-demo-bottom-cover-removed.jpg" width="49%" />
+  <img src="showcase/earthquake_data_display.jpeg" />
 </p>
+
+This is a weather display powered by a wifi-enabled ESP32 microcontroller and a 7.5in E-Paper (aka E-ink) display. Current and forecasted weather data is obtained from the OpenWeatherMap API. A sensor provides the display with accurate indoor temperature and humidity.
 
 The project draws ~14μA when sleeping and an estimated average of ~83mA during its ~15s wake period. The display can be configured to update as frequently as desired. When the refresh interval is set to 30 minutes, the device will run for >6 months on a single 5000mAh battery. The project displays accurate battery life percentage and can be recharged via a USB-C cable connected to a wall adapter or computer.
 
